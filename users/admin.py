@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 from .models import UserModel, CheckEmail
 
-admin.site.site_header = "Food admin page"
+admin.site.site_header = "Delivery admin page"
 admin.site.index_title = ""
 admin.site.site_title = "Admin page"
 

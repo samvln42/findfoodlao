@@ -13,12 +13,12 @@ urlpatterns = [
     path("user/", include("users.urls")),
     path("store/", include("store.urls")),
     path("restaurants/", include("restaurant2.urls")),
-    path("", include_docs_urls(title="OverSea APIs") ),
+    path("", include_docs_urls(title="Delivery APIs") ),
     path(
         "schema",
         get_schema_view(
-            title="OverSea APIs",
-            description="APIs for Humascot OverSea",
+            title="Delivery APIs",
+            description="APIs for Humascot Delivery",
             version="1.0.0",
         ),
         name="openapi-shecma",
