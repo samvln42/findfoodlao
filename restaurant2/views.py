@@ -34,7 +34,7 @@ from .serializers import (
     
 )
 
-from channels.layers import get_channel_layer
+# from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
 
@@ -610,38 +610,38 @@ def get_latest_order_by_table(request, restaurant_id, table_id):
 #         order = serializer.save()
 #         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-@api_view(['POST'])
-def create_or_update_order(request, restaurant_id, table_id):
-    try:
-        latest_order = Order.objects.filter(restaurant_id=restaurant_id, table_id=table_id).latest('timestamp')
-    except Order.DoesNotExist:
-        latest_order = None
+# @api_view(['POST'])
+# def create_or_update_order(request, restaurant_id, table_id):
+#     try:
+#         latest_order = Order.objects.filter(restaurant_id=restaurant_id, table_id=table_id).latest('timestamp')
+#     except Order.DoesNotExist:
+#         latest_order = None
 
-    serializer = OrderSerializer2(data=request.data)
-    serializer.is_valid(raise_exception=True)
+#     serializer = OrderSerializer2(data=request.data)
+#     serializer.is_valid(raise_exception=True)
 
-    if latest_order and not latest_order.paid:
-        # Update the latest unpaid order
-        serializer.instance = latest_order
-        serializer.update(latest_order, serializer.validated_data)
-        created = False
-    else:
-        # Create a new order
-        latest_order = serializer.save()
-        created = True
+#     if latest_order and not latest_order.paid:
+#         # Update the latest unpaid order
+#         serializer.instance = latest_order
+#         serializer.update(latest_order, serializer.validated_data)
+#         created = False
+#     else:
+#         # Create a new order
+#         latest_order = serializer.save()
+#         created = True
 
-    # Send notification via WebSocket
-    channel_layer = get_channel_layer()
-    message = f"Order {latest_order.id} at Table {latest_order.table.number} {'created' if created else 'updated'}"
-    async_to_sync(channel_layer.group_send)(
-        'orders',
-        {
-            'type': 'order_notification',
-            'message': message
-        }
-    )
+#     # Send notification via WebSocket
+#     channel_layer = get_channel_layer()
+#     message = f"Order {latest_order.id} at Table {latest_order.table.number} {'created' if created else 'updated'}"
+#     async_to_sync(channel_layer.group_send)(
+#         'orders',
+#         {
+#             'type': 'order_notification',
+#             'message': message
+#         }
+#     )
 
-    return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+#     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
     
 
 @api_view(['PATCH'])
@@ -690,45 +690,45 @@ def update_latest_order_paid_status(request, restaurant_id, table_id):
 #         return Response(response_data)
     
     
-class PendingOrdersByTableView(APIView):
+# class PendingOrdersByTableView(APIView):
 
-    def get(self, request, restaurant_id, table_id):
-        # Filter orders by restaurant and table
-        orders = Order.objects.filter(
-            restaurant_id=restaurant_id,
-            table_id=table_id
-        )
+#     def get(self, request, restaurant_id, table_id):
+#         # Filter orders by restaurant and table
+#         orders = Order.objects.filter(
+#             restaurant_id=restaurant_id,
+#             table_id=table_id
+#         )
         
-        # Filter order items by pending status
-        pending_order_items = OrderItem.objects.filter(
-            order__in=orders,
-            status="PENDING"
-        )
+#         # Filter order items by pending status
+#         pending_order_items = OrderItem.objects.filter(
+#             order__in=orders,
+#             status="PENDING"
+#         )
         
-        # Count the number of pending order items
-        pending_count = pending_order_items.count()
+#         # Count the number of pending order items
+#         pending_count = pending_order_items.count()
         
-        # Serialize the orders
-        serializer = OrderSerializerList2(orders, many=True)
+#         # Serialize the orders
+#         serializer = OrderSerializerList2(orders, many=True)
         
-        # Create a custom response data structure
-        response_data = {
-            'pending_count': pending_count,
-            'pending_orders': serializer.data
-        }
+#         # Create a custom response data structure
+#         response_data = {
+#             'pending_count': pending_count,
+#             'pending_orders': serializer.data
+#         }
 
-        # Send notification via WebSocket
-        channel_layer = get_channel_layer()
-        message = f"Pending orders retrieved for Table {table_id} in Restaurant {restaurant_id}"
-        async_to_sync(channel_layer.group_send)(
-            'orders',
-            {
-                'type': 'order_notification',
-                'message': message
-            }
-        )
+#         # Send notification via WebSocket
+#         channel_layer = get_channel_layer()
+#         message = f"Pending orders retrieved for Table {table_id} in Restaurant {restaurant_id}"
+#         async_to_sync(channel_layer.group_send)(
+#             'orders',
+#             {
+#                 'type': 'order_notification',
+#                 'message': message
+#             }
+#         )
 
-        return Response(response_data)
+#         return Response(response_data)
 
     
 class OrderItemStatusUpdateView(APIView):

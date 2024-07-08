@@ -54,9 +54,9 @@ urlpatterns = [
     # path('<int:restaurant_pk>/orders/<int:pk>/update2/', views.OrderUpdateAPIView2.as_view(), name='order-update'),
     # path('<int:restaurant_id>/table/<int:table_id>/', views.get_orders_by_table, name='orders-by-table'),
     path('<int:restaurant_id>/table/<int:table_id>/latest/', views.get_latest_order_by_table, name='orders-by-table-latest'),
-    path('<int:restaurant_id>/table/<int:table_id>/create_or_update/', views.create_or_update_order, name='create-or-update-order'),
+    # path('<int:restaurant_id>/table/<int:table_id>/create_or_update/', views.create_or_update_order, name='create-or-update-order'),
     path('<int:restaurant_id>/table/<int:table_id>/update_paid_status/', views.update_latest_order_paid_status, name='update-latest-order-paid-status'),
-    path('<int:restaurant_id>/table/<int:table_id>/pending-orders/', views.PendingOrdersByTableView.as_view(), name='pending-orders-by-table'),
+    # path('<int:restaurant_id>/table/<int:table_id>/pending-orders/', views.PendingOrdersByTableView.as_view(), name='pending-orders-by-table'),
     path('order-items/<int:pk>/status/', views.OrderItemStatusUpdateView.as_view(), name='update-order-item-status'),
     path('<int:restaurant_id>/tables-with-pending-orders/', views.TablesWithPendingOrdersView.as_view(), name='tables-with-pending-orders'),
     
