@@ -441,23 +441,13 @@ class GoodsView(generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ["name"]  # Specify fields you want to search
     
-    def get(self, request, goods_id=None):
-        store_id = request.GET.get("store_id")
-
-        if goods_id is None:
-            goods = self.get_filtered_goods(store_id)
-
-            if not goods.exists():
-                return Response([], status=200)
-
-            serializer = GoodsSerializer(goods, many=True)
-            return Response(serializer.data)
-        else:
-            goods = get_object_or_404(GoodsModel, id=goods_id)
-            serializer = GoodsDetailSerializer(goods)
-            result = serializer.data.copy()
-            result["is_ordered"] = self.is_ordered_by_user(request.user.id, goods)
-            return Response(result, status=200)
+class GoodsDetailView(generics.ListAPIView):
+    def get(self, request, goods_id):
+        goods = get_object_or_404(GoodsModel, id=goods_id)
+        serializer = GoodsDetailSerializer(goods)
+        result = serializer.data.copy()
+        result["is_ordered"] = self.is_ordered_by_user(request.user.id, goods)
+        return Response(result, status=200)
     
     def is_ordered_by_user(self, user_id, goods):
         order_total = OrderModel.objects.filter(user_id=user_id, goods=goods).count()
