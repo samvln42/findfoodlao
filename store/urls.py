@@ -14,7 +14,7 @@ urlpatterns = [
     path("categories/<int:pk>", views.CategoryDetail.as_view(), name='category-detail'),
     path("all-stores", views.StoreViewSet.as_view({'get': 'list'}), name='store-list'),
     path("", views.GoodsView.as_view(), name="goods_list"),  # Product list related
-    path("detail/<int:goods_id>", views.GoodsDetailView.as_view(), name="goods_detail"),  # Product list related
+    path("detail/<int:goods_id>", views.GoodsView.as_view(), name="goods_detail"),  # Product list related
     # path("<int:store_id>", views.CreateProductAPIView.as_view(), name="store"),  # Store Related Related
     path("<int:store_id>", views.StoreView.as_view(), name="store"),  # Store Related Related
     path('product/create', views.CreateProductAPIView.as_view(), name='create-product'),
@@ -72,8 +72,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('bank-accounts/update/<int:store_id>', views.BankAccountUpdateAPIView.as_view(), name='bank-account-update'),
     # Web info
-    path("web-info", views.WebInfoListCreateAPIView.as_view(), name="web-info-list-create"),
-    path("web-info/<int:pk>", views.WebInfoRetrieveUpdateAPIView.as_view(), name="edit-web-information"),
+    path("web-info", views.WebInfoList.as_view(), name="web-info-list"),
+    path("web-info/create_update", views.WebInfoCreateOrUpdate.as_view(), name="edit-update-web-information"),
     # Notice
     path("notice", views.NoticeList.as_view(), name="list-notice"),
     path("notice/create", views.NoticeCreate.as_view(), name="list-notice"),

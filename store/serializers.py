@@ -873,7 +873,9 @@ class WebInfoSerializer(serializers.ModelSerializer):
             "address",
             "description",
             "logo",
-            "background",
+            "banner1",
+            "banner2",
+            "banner3",
         ]
 
 

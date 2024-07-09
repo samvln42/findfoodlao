@@ -273,10 +273,16 @@ class WebInfo(models.Model):
     address = models.CharField(max_length=100)
     description = models.TextField()
     logo = models.FileField(
-        null=True, blank=True, verbose_name="logo image", upload_to="media/"
+        null=True, blank=True, verbose_name="logo image", upload_to="media/webinfo/"
     )
-    background = models.FileField(
-        null=True, blank=True, verbose_name="background image", upload_to="media/"
+    banner1 = models.FileField(
+        null=True, blank=True, verbose_name="banner1 image", upload_to="media/webinfo/"
+    )
+    banner2 = models.FileField(
+        null=True, blank=True, verbose_name="banner2 image", upload_to="media/webinfo/"
+    )
+    banner3 = models.FileField(
+        null=True, blank=True, verbose_name="banner3 image", upload_to="media/webinfo/"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

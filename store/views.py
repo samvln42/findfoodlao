@@ -369,90 +369,90 @@ class GoodsView2(APIView):
 #             return Response(result, status=200)
 
 
-# class GoodsView(APIView):
-#     @swagger_auto_schema(
-#         tags=["View product list and details"], responses={200: "Success"}
-#     )
-#     def get(self, request, goods_id=None):
-#         category_name = request.GET.get("category_name")
-#         category_type = request.GET.get("category_type", "1")  # Default category type
-#         store_id = request.GET.get("store_id")
+class GoodsView(APIView):
+    @swagger_auto_schema(
+        tags=["View product list and details"], responses={200: "Success"}
+    )
+    def get(self, request, goods_id=None):
+        category_name = request.GET.get("category_name")
+        category_type = request.GET.get("category_type", "1")  # Default category type
+        store_id = request.GET.get("store_id")
 
-#         if goods_id is None:
-#             goods = self.get_filtered_goods(category_name, category_type, store_id)
+        if goods_id is None:
+            goods = self.get_filtered_goods(category_name, category_type, store_id)
 
-#             if not goods.exists():
-#                 return Response([], status=200)
+            if not goods.exists():
+                return Response([], status=200)
 
-#             serializer = GoodsSerializer(goods, many=True)
-#             return Response(serializer.data)
-#         else:
-#             goods = get_object_or_404(GoodsModel, id=goods_id)
-#             serializer = GoodsDetailSerializer(goods)
-#             result = serializer.data.copy()
-#             result["is_ordered"] = self.is_ordered_by_user(request.user.id, goods)
-#             return Response(result, status=200)
+            serializer = GoodsSerializer(goods, many=True)
+            return Response(serializer.data)
+        else:
+            goods = get_object_or_404(GoodsModel, id=goods_id)
+            serializer = GoodsDetailSerializer(goods)
+            result = serializer.data.copy()
+            result["is_ordered"] = self.is_ordered_by_user(request.user.id, goods)
+            return Response(result, status=200)
 
-#     def get_filtered_goods(self, category_name, category_type, store_id):
-#         goods = GoodsModel.objects.all()
+    def get_filtered_goods(self, category_name, category_type, store_id):
+        goods = GoodsModel.objects.all()
 
-#         if store_id:
-#             goods = goods.filter(store_id=store_id)
+        if store_id:
+            goods = goods.filter(store_id=store_id)
 
-#         if category_name:
-#             category = get_object_or_404(CategoryModel, name=category_name)
-#             goods = goods.filter(category=category)
+        if category_name:
+            category = get_object_or_404(CategoryModel, name=category_name)
+            goods = goods.filter(category=category)
 
-#         sorting_mapping = {
-#             "2": "-price",
-#             "3": "-review_count",
-#             "4": "price",
-#             "5": "-order_count",
-#             "1": "-created_at",
-#         }
+        sorting_mapping = {
+            "2": "-price",
+            "3": "-review_count",
+            "4": "price",
+            "5": "-order_count",
+            "1": "-created_at",
+        }
 
 
-#         sorting_key = sorting_mapping.get(category_type, sorting_mapping["1"])
+        sorting_key = sorting_mapping.get(category_type, sorting_mapping["1"])
 
-#         if category_type == "3":
-#             goods = goods.annotate(review_count=Count("review"))
+        if category_type == "3":
+            goods = goods.annotate(review_count=Count("review"))
 
-#         if category_type in ["5", "6"]:
-#             goods = goods.annotate(order_count=Count("order"))
+        if category_type in ["5", "6"]:
+            goods = goods.annotate(order_count=Count("order"))
 
-#         if category_type == "7":
-#             goods = goods.filter(is_popular=True)
+        if category_type == "7":
+            goods = goods.filter(is_popular=True)
 
-#         try:
-#             goods = goods.order_by(sorting_key)
-#         except Exception as e:
-#             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            goods = goods.order_by(sorting_key)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-#         return goods
+        return goods
 
-#     def is_ordered_by_user(self, user_id, goods):
-#         order_total = OrderModel.objects.filter(user_id=user_id, goods=goods).count()
-#         review_total = ReviewModel.objects.filter(user_id=user_id, goods=goods).count()
-#         return order_total >= review_total
-
-class GoodsView(generics.ListAPIView):
-    queryset = GoodsModel.objects.all()
-    serializer_class = GoodsSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ["name"]  # Specify fields you want to search
-    
-class GoodsDetailView(generics.ListAPIView):
-    def get(self, request, goods_id):
-        goods = get_object_or_404(GoodsModel, id=goods_id)
-        serializer = GoodsDetailSerializer(goods)
-        result = serializer.data.copy()
-        result["is_ordered"] = self.is_ordered_by_user(request.user.id, goods)
-        return Response(result, status=200)
-    
     def is_ordered_by_user(self, user_id, goods):
         order_total = OrderModel.objects.filter(user_id=user_id, goods=goods).count()
         review_total = ReviewModel.objects.filter(user_id=user_id, goods=goods).count()
         return order_total >= review_total
+
+# class GoodsView(generics.ListAPIView):
+#     queryset = GoodsModel.objects.all()
+#     serializer_class = GoodsSerializer
+#     filter_backends = [filters.SearchFilter]
+#     search_fields = ["name"]  # Specify fields you want to search
+    
+# class GoodsDetailView(generics.ListAPIView):
+#     def get(self, request, goods_id):
+#         goods = get_object_or_404(GoodsModel, id=goods_id)
+#         serializer = GoodsDetailSerializer(goods)
+#         result = serializer.data.copy()
+#         result["is_ordered"] = self.is_ordered_by_user(request.user.id, goods)
+#         return Response(result, status=200)
+    
+#     def is_ordered_by_user(self, user_id, goods):
+#         order_total = OrderModel.objects.filter(user_id=user_id, goods=goods).count()
+#         review_total = ReviewModel.objects.filter(user_id=user_id, goods=goods).count()
+#         return order_total >= review_total
 
 class StoreViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = StoreModel.objects.all()
@@ -1331,12 +1331,38 @@ class BankAccountUpdateAPIView(generics.UpdateAPIView):
 
 
 # Website infomation
-class WebInfoListCreateAPIView(generics.ListCreateAPIView):
+# class WebInfoListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = WebInfo.objects.all()
+#     serializer_class = WebInfoSerializer
+
+
+# class WebInfoRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+#     queryset = WebInfo.objects.all()
+#     serializer_class = WebInfoSerializer
+#     lookup_field = "pk"  # Use 'pk' as the lookup field for retrieving and updating the WebInfo object
+
+class WebInfoList(generics.ListAPIView):
     queryset = WebInfo.objects.all()
     serializer_class = WebInfoSerializer
 
+# class WebInfoRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = WebInfo.objects.all()
+#     serializer_class = WebInfoSerializer
 
-class WebInfoRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
-    queryset = WebInfo.objects.all()
-    serializer_class = WebInfoSerializer
-    lookup_field = "pk"  # Use 'pk' as the lookup field for retrieving and updating the WebInfo object
+class WebInfoCreateOrUpdate(APIView):
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # Assuming there's only one instance of WebInfo to update
+            webinfo = WebInfo.objects.first()
+            if webinfo:
+                serializer = WebInfoSerializer(webinfo, data=request.data)
+            else:
+                serializer = WebInfoSerializer(data=request.data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
