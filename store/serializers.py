@@ -878,6 +878,20 @@ class WebInfoSerializer(serializers.ModelSerializer):
             "banner3",
         ]
 
+class WebInfoLogoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WebInfo
+        fields = [
+            "logo"
+        ]
+        
+class WebInfoBannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WebInfo
+        fields = [
+            "banner1"
+        ]
+
 
 class NoticeListSerializers(serializers.ModelSerializer):
     user = UserSerializer()

@@ -266,12 +266,12 @@ class WebInfo(models.Model):
         db_table = "WebInfo"
         verbose_name_plural = "Website Informations"
         
-    name = models.CharField(max_length=100)
-    tel1 = models.CharField(max_length=20)
-    tel2 = models.CharField(max_length=20)
-    email = models.CharField(max_length=100)
-    address = models.CharField(max_length=100)
-    description = models.TextField()
+    name = models.CharField(null=True, blank=True, max_length=100)
+    tel1 = models.CharField(null=True, blank=True, max_length=20)
+    tel2 = models.CharField(null=True, blank=True, max_length=20)
+    email = models.CharField(null=True, blank=True, max_length=100)
+    address = models.CharField(null=True, blank=True, max_length=100)
+    description = models.TextField(null=True, blank=True)
     logo = models.FileField(
         null=True, blank=True, verbose_name="logo image", upload_to="media/webinfo/"
     )

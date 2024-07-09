@@ -1351,7 +1351,7 @@ class WebInfoList(generics.ListAPIView):
 
 class WebInfoCreateOrUpdate(APIView):
 
-    def post(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         try:
             # Assuming there's only one instance of WebInfo to update
             webinfo = WebInfo.objects.first()
@@ -1366,3 +1366,20 @@ class WebInfoCreateOrUpdate(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+# class WebInfoUpdate(APIView):
+#     try:
+#         # Assuming there's only one instance of WebInfo to update
+#         webinfo = WebInfo.objects.first()
+#         if webinfo:
+#             serializer = WebInfoSerializer(webinfo, data=request.data)
+#         else:
+#             serializer = WebInfoSerializer(data=request.data)
+
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     except Exception as e:
+#         return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
