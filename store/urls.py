@@ -80,5 +80,8 @@ urlpatterns = [
     path("notice/detail/<int:pk>", views.NoticeDetailDelete.as_view(), name="detail-notice"),
     path("notice/delete/<int:pk>", views.NoticeDetailDelete.as_view(), name="delete-notice"),
     path("notice/update/<int:pk>", views.NoticeUpdate.as_view(), name="update-notice"),
+    # hotel QR
+    path('hotel-qr', views.HotelQRListCreateAPIView.as_view(), name='hotel-qr-list-create'),
+    path('hotel-qr/<int:pk>', views.HotelQRRetrieveUpdateDestroyAPIView.as_view(), name='hotel-qr-detail'),
 ]
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

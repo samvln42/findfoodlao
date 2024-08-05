@@ -9,13 +9,13 @@ from rest_framework.schemas import get_schema_view
 from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("user/", include("users.urls")),
-    path("store/", include("store.urls")),
-    path("restaurants/", include("restaurant2.urls")),
-    path("", include_docs_urls(title="Delivery APIs") ),
+    path("api/admin/", admin.site.urls),
+    path("api/user/", include("users.urls")),
+    path("api/store/", include("store.urls")),
+    path("api/restaurants/", include("restaurant2.urls")),
+    path("api/", include_docs_urls(title="Delivery APIs") ),
     path(
-        "schema",
+        "api/schema",
         get_schema_view(
             title="Delivery APIs",
             description="APIs for Humascot Delivery",

@@ -17,7 +17,8 @@ from .models import (
     SizeModel,
     ColorModel,
     WebInfo,
-    NoticeModel
+    NoticeModel,
+    HotelQR
 )
 
 
@@ -115,5 +116,6 @@ admin.site.register(BankAccount)
 admin.site.register(Review)
 admin.site.register(SizeModel)
 admin.site.register(ColorModel)
-admin.site.register(WebInfo)
+admin.site.register(WebInfo) 
 admin.site.register(NoticeModel)
+admin.site.register(HotelQR)

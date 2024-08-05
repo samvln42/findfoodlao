@@ -40,6 +40,7 @@ from .models import (
     Review,
     WebInfo,
     NoticeModel,
+    HotelQR
 )
 from .serializers import (
     StoreSerializer,
@@ -69,6 +70,7 @@ from .serializers import (
     WebInfoSerializer,
     NoticeListSerializers,
     NoticeSerializers,
+    HotelQRSerializers
 )
 
 from .permissions import IsOwnerOrReadOnly
@@ -1368,18 +1370,13 @@ class WebInfoCreateOrUpdate(APIView):
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         
-# class WebInfoUpdate(APIView):
-#     try:
-#         # Assuming there's only one instance of WebInfo to update
-#         webinfo = WebInfo.objects.first()
-#         if webinfo:
-#             serializer = WebInfoSerializer(webinfo, data=request.data)
-#         else:
-#             serializer = WebInfoSerializer(data=request.data)
+# Hotel QR management
+class HotelQRListCreateAPIView(generics.ListCreateAPIView):
+    queryset = HotelQR.objects.all()
+    serializer_class = HotelQRSerializers
 
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#     except Exception as e:
-#         return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class HotelQRRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = HotelQR.objects.all()
+    serializer_class = HotelQRSerializers
+    

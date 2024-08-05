@@ -1,5 +1,8 @@
 from django.db import models
 from users.models import UserModel
+import qrcode
+from io import BytesIO
+from django.core.files import File
 
 
 class CategoryModel(models.Model):
@@ -305,3 +308,105 @@ class NoticeModel(models.Model):
     
     def __str__(self):
         return self.subject
+    
+ 
+# class HotelQR(models.Model):
+#     hotel = models.CharField(max_length=125, verbose_name="hotel")
+#     room_number = models.CharField(max_length=15, verbose_name="room number")
+#     address = models.CharField(max_length=15, verbose_name="room number")
+#     qr_code = models.ImageField(upload_to="qr_codes/", blank=True)
+
+#     def save(self, *args, **kwargs):
+#         # Determine if the instance is being created for the first time
+#         creating = self.pk is None
+#         super().save(*args, **kwargs)
+        
+#         if creating:
+#             # Generate the QR code using the assigned ID
+#             qr_url = f"http://43.201.158.188/hotel/{self.hotel}/room_number/{self.room_number}/address/{self.address}"
+#             qr = qrcode.make(qr_url)
+#             qr_io = BytesIO()
+#             qr.save(qr_io, "PNG")
+#             qr_file = File(qr_io, name=f"{self.id}.png")
+            
+#             # Save the QR code image
+#             self.qr_code.save(f"{self.id}.png", qr_file, save=False)
+            
+#             # Save the instance again to update the qr_code field
+#             super().save(update_fields=['qr_code'])
+
+#     def _str_(self):
+#         return f"Hotel: {self.hotel} - Room number: {self.room_number} - Address: {self.address}"
+
+# class HotelQR(models.Model):
+#     hotel = models.CharField(max_length=125, verbose_name="hotel")
+#     room_number = models.CharField(max_length=15, verbose_name="room number")
+#     address = models.CharField(max_length=125, verbose_name="address")
+#     qr_code = models.ImageField(upload_to="qr_codes/", blank=True)
+
+#     def save(self, *args, **kwargs):
+#         # Check if any of the relevant fields are being updated
+#         updating_fields = ['hotel', 'room_number', 'address']
+#         is_update = any(self.pk is not None and getattr(self, field) != getattr(self.__class__.objects.get(pk=self.pk), field) for field in updating_fields)
+
+#         super().save(*args, **kwargs)
+        
+#         if self.pk is None or is_update:
+#             # Generate the QR code using the updated or assigned ID
+#             qr_url = f"http://43.201.158.188/hotel/{self.hotel}/room_number/{self.room_number}/address/{self.address}"
+#             qr = qrcode.make(qr_url)
+#             qr_io = BytesIO()
+#             qr.save(qr_io, "PNG")
+#             qr_file = File(qr_io, name=f"{self.id}.png")
+            
+#             # Save the QR code image
+#             self.qr_code.save(f"{self.id}.png", qr_file, save=False)
+            
+#             # Save the instance again to update the qr_code field
+#             super().save(update_fields=['qr_code'])
+
+#     def __str__(self):
+#         return f"Hotel: {self.hotel} - Room number: {self.room_number} - Address: {self.address}"
+
+
+class HotelQR(models.Model):
+    hotel = models.CharField(max_length=125, verbose_name="hotel")
+    room_number = models.CharField(max_length=15, verbose_name="room number")
+    address = models.CharField(max_length=15, verbose_name="address")
+    qr_code = models.ImageField(upload_to="qr_codes/", blank=True)
+
+    def save(self, *args, **kwargs):
+        # Determine if the instance is being created for the first time
+        creating = self.pk is None
+        if not creating:
+            # Fetch the existing instance for comparison
+            old_instance = self.__class__.objects.get(pk=self.pk)
+            # Check if any relevant fields are updated
+            fields_updated = (
+                self.hotel != old_instance.hotel or
+                self.room_number != old_instance.room_number or
+                self.address != old_instance.address
+            )
+        else:
+            fields_updated = True  # Always generate QR code for new instances
+
+        super().save(*args, **kwargs)
+
+        if creating or fields_updated:
+            # Generate the QR code using the updated or assigned ID
+            qr_url = f"http://43.201.158.188/hotel/{self.hotel}/room_number/{self.room_number}/address/{self.address}"
+            qr = qrcode.make(qr_url)
+            qr_io = BytesIO()
+            qr.save(qr_io, "PNG")
+            qr_file = File(qr_io, name=f"{self.id}.png")
+
+            # Save the QR code image
+            self.qr_code.save(f"{self.id}.png", qr_file, save=False)
+
+            # Save the instance again to update the qr_code field
+            super().save(update_fields=['qr_code'])
+
+    def __str__(self):
+        return f"Hotel: {self.hotel} - Room number: {self.room_number} - Address: {self.address}"
+
+  

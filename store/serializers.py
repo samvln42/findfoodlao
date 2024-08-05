@@ -19,6 +19,7 @@ from store.models import (
     Review,
     WebInfo,
     NoticeModel,
+    HotelQR
 )
 from users.models import UserModel
 
@@ -905,3 +906,8 @@ class NoticeSerializers(serializers.ModelSerializer):
     class Meta:
         model = NoticeModel
         fields = ["id", "subject", "user", "brochure"]
+
+class HotelQRSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = HotelQR
+        fields = ["id", "hotel", "room_number", "address", "qr_code"]
