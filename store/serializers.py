@@ -39,7 +39,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class GoodsSerializer(serializers.ModelSerializer):
     store_name = serializers.SerializerMethodField()
     star_avg = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()
+    # category = serializers.SerializerMethodField()
     format_price = serializers.SerializerMethodField()
     review_total = serializers.SerializerMethodField()
     store_address = serializers.SerializerMethodField()
@@ -62,8 +62,8 @@ class GoodsSerializer(serializers.ModelSerializer):
 
         return math.ceil(total / review.count()) if total != 0 else 0
 
-    def get_category(self, obj):
-        return obj.category.name
+    # def get_category(self, obj):
+    #     return obj.category.name
 
     def get_format_price(self, obj):
         return str(format_with_commas(obj.price))
