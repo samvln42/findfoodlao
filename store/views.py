@@ -993,6 +993,14 @@ class UserOrderListView(generics.ListAPIView):
 #     serializer_class = OrderSerializer
 
 
+# class OrderCreateAPIView(APIView):
+#     def post(self, request):
+#         serializer = OrderCreateSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response({"message": "success"}, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class OrderCreateAPIView(APIView):
     def post(self, request):
         serializer = OrderCreateSerializer(data=request.data)
@@ -1000,6 +1008,7 @@ class OrderCreateAPIView(APIView):
             serializer.save()
             return Response({"message": "success"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class OrderUpdateAPIView(APIView):

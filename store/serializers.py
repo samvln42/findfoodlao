@@ -149,42 +149,6 @@ class StoreSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# old review
-# class ReviewSerializer(serializers.ModelSerializer):
-#     profile_image = serializers.SerializerMethodField()
-#     created_at = serializers.SerializerMethodField()
-#     nickname = serializers.SerializerMethodField()
-
-#     def validate(self, attrs):
-#         review = attrs.get("review")
-#         if review:
-#             if len(review) < 10:
-#                 raise ValidationError("Please register your review with at least 10 characters.")
-#         return attrs
-
-#     def get_profile_image(self, obj):
-#         user = UserModel.objects.get(id=obj.user.id)
-#         if not user.profile_image:
-#             return None
-#         else:
-#             return user.profile_image.url
-
-#     def get_created_at(self, obj):
-#         return obj.created_at.strftime("%Y.%m.%d")
-
-#     def get_nickname(self, obj):
-#         return obj.user.nickname
-
-#     class Meta:
-#         # model = ReviewModel
-#         model = Review
-#         exclude = ["updated_at", "product"]
-#         extra_kwargs = {
-#             "user": {"required": False},
-#             "product": {"required": False},
-#         }
-
-
 # new review
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -368,7 +332,7 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
         fields = ["id", "product", "quantity", "price", "color", "size"]
 
 
-class OrderCreateSerializer(serializers.ModelSerializer):
+class OrderCreateSerializer2(serializers.ModelSerializer):
     items = OrderItemCreateSerializer(many=True, write_only=True)
 
     def create(self, validated_data):
@@ -396,6 +360,56 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             "items",
         ]
 
+
+class OrderCreateSerializer(serializers.ModelSerializer):
+    items = OrderItemCreateSerializer(many=True, write_only=True)
+
+    def validate_items(self, items):
+        for item in items:
+            product = item['product']
+            if item['quantity'] > product.quantity:
+                raise serializers.ValidationError(
+                    f"Insufficient quantity for product '{product.name}'. "
+                    f"Available: {product.quantity}, requested: {item['quantity']}"
+                )
+        return items
+
+    def create(self, validated_data):
+        order_items_data = validated_data.pop("items")
+        order = Order.objects.create(**validated_data)
+        total_prices = 0
+        for order_item_data in order_items_data:
+            product = order_item_data['product']
+            quantity = order_item_data['quantity']
+            
+            # Decrease the quantity of the product
+            product.quantity -= quantity
+            product.save()
+            
+            order_item = OrderItem.objects.create(order=order, **order_item_data)
+            total_prices += order_item.price * order_item.quantity
+
+        order.total_prices = total_prices
+        order.save()
+        return order
+
+    class Meta:
+        model = Order
+        fields = [
+            "id",
+            "user",
+            "store",
+            "tel",
+            "total_prices",
+            "account_name",
+            "province",
+            "district",
+            "shipping_company",
+            "branch",
+            "created_at",
+            "status",
+            "items",
+        ]
 
 class PendingOrderSerializer(OrderSerializer):
     class Meta:
@@ -638,6 +652,7 @@ class OnlyStoreGoodsSerializer(serializers.ModelSerializer):
             "order_set",
             "name",
             "price",
+            "quantity",
             "format_price",
             "image_set",
             "images",
@@ -706,6 +721,7 @@ class CreateProductSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "price",
+            "quantity",
             "category",
             "store",
             "sizes",
@@ -797,6 +813,7 @@ class UpdateProductSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "price",
+            "quantity",
             "category",
             "sizes",
             "colors",
