@@ -326,98 +326,70 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
 
-# class OrderItemCreateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = OrderItem
-#         fields = ["id", "product", "quantity", "price", "color", "size"]
-
-
-# class OrderCreateSerializer2(serializers.ModelSerializer):
-#     items = OrderItemCreateSerializer(many=True, write_only=True)
-
-#     def create(self, validated_data):
-#         order_items_data = validated_data.pop("items")
-#         order = Order.objects.create(**validated_data)
-#         for order_item_data in order_items_data:
-#             OrderItem.objects.create(order=order, **order_item_data)
-#         return order
-
-#     class Meta:
-#         model = Order
-#         fields = [
-#             "id",
-#             "user",
-#             "store",
-#             "tel",
-#             "total_prices",
-#             "account_name",
-#             "province",
-#             "district",
-#             "shipping_company",
-#             "branch",
-#             "created_at",
-#             "status",
-#             "items",
-#         ]
-
-
-# class OrderCreateSerializer(serializers.ModelSerializer):
-#     items = OrderItemCreateSerializer(many=True, write_only=True)
-
-#     def validate_items(self, items):
-#         for item in items:
-#             product = item['product']
-#             if item['quantity'] > product.quantity:
-#                 raise serializers.ValidationError(
-#                     f"Insufficient quantity for product '{product.name}'. "
-#                     f"Available: {product.quantity}, requested: {item['quantity']}"
-#                 )
-#         return items
-
-#     def create(self, validated_data):
-#         order_items_data = validated_data.pop("items")
-#         order = Order.objects.create(**validated_data)
-#         total_prices = 0
-#         for order_item_data in order_items_data:
-#             product = order_item_data['product']
-#             quantity = order_item_data['quantity']
-            
-#             # Decrease the quantity of the product
-#             product.quantity -= quantity
-#             product.save()
-            
-#             order_item = OrderItem.objects.create(order=order, **order_item_data)
-#             total_prices += order_item.price * order_item.quantity
-
-#         order.total_prices = total_prices
-#         order.save()
-#         return order
-
-#     class Meta:
-#         model = Order
-#         fields = [
-#             "id",
-#             "user",
-#             "store",
-#             "tel",
-#             "total_prices",
-#             "account_name",
-#             "province",
-#             "district",
-#             "shipping_company",
-#             "branch",
-#             "created_at",
-#             "status",
-#             "items",
-#         ]
-
-
 class OrderItemCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ["id", "product", "quantity", "price", "color", "size"]
+
+
+class OrderCreateSerializer(serializers.ModelSerializer):
+    items = OrderItemCreateSerializer(many=True, write_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=UserModel.objects.all(), required=False, allow_null=True)
+
+    def validate_items(self, items):
+        for item in items:
+            product = item['product']
+            if item['quantity'] > product.quantity:
+                raise serializers.ValidationError(
+                    f"Insufficient quantity for product '{product.name}'. "
+                    f"Available: {product.quantity}, requested: {item['quantity']}"
+                )
+        return items
+
+    def create(self, validated_data):
+        order_items_data = validated_data.pop("items")
+        order = Order.objects.create(**validated_data)
+        total_prices = 0
+        for order_item_data in order_items_data:
+            product = order_item_data['product']
+            quantity = order_item_data['quantity']
+            
+            # Decrease the quantity of the product
+            product.quantity -= quantity
+            product.save()
+            
+            order_item = OrderItem.objects.create(order=order, **order_item_data)
+            total_prices += order_item.price * order_item.quantity
+
+        order.total_prices = total_prices
+        order.save()
+        return order
+
+    class Meta:
+        model = Order
+        fields = [
+            "id",
+            "user",
+            "store",
+            "tel",
+            "total_prices",
+            "account_name",
+            "province",
+            "district",
+            "shipping_company",
+            "branch",
+            "created_at",
+            "status",
+            "items",
+        ]
+
+# -----------
+class OrderItemCreateSerializer2(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ["product", "quantity", "price", "color", "size"]
 
-class OrderCreateSerializer(serializers.ModelSerializer):
+class OrderCreateSerializer2(serializers.ModelSerializer):
     items = OrderItemCreateSerializer(many=True, write_only=True)
     user = serializers.PrimaryKeyRelatedField(queryset=UserModel.objects.all(), required=False, allow_null=True)
 
@@ -453,7 +425,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         order_items = [OrderItem(order=order, **item) for item in items_data]
         OrderItem.objects.bulk_create(order_items)
         return order
-    
+# -----------  
 
 class PendingOrderSerializer(OrderSerializer):
     class Meta:
