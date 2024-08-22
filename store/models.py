@@ -184,7 +184,7 @@ class OrderItem(models.Model):
     size = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"OrderItem {self.pk} - Product: {self.product.name}, Quantity: {self.quantity}"
+        return f"OrderItem {self.pk} - Product: {self.product}, Quantity: {self.quantity}"
 
 
 # old review
