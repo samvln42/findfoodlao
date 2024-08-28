@@ -65,7 +65,9 @@ class GoodsModel(models.Model):
         verbose_name="category",
     )
     name = models.CharField(max_length=100, verbose_name="product name")
-    price = models.PositiveIntegerField(default=0, verbose_name="price")
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0.00, verbose_name="price"
+    )
     description = models.TextField(blank=True)
     quantity = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -336,7 +338,7 @@ class HotelQR(models.Model):
 
         if creating or fields_updated:
             # Generate the QR code using the updated or assigned ID
-            qr_url = f"http://43.201.158.188/hotel/{self.hotel}/room_number/{self.room_number}/address/{self.address}"
+            qr_url = f"http://findfoodlao.com/hotel/{self.hotel}/room_number/{self.room_number}/address/{self.address}"
             qr = qrcode.make(qr_url)
             qr_io = BytesIO()
             qr.save(qr_io, "PNG")
