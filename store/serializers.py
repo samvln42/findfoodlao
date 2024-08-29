@@ -480,6 +480,7 @@ class ProcessingOrderSerializer(OrderSerializer):
 
 
 class DeliveredOrderSerializer(OrderSerializer):
+    items = OrderItemSerializer(source='orderitem_set', many=True)
     class Meta:
         model = Order
         fields = [
@@ -548,6 +549,18 @@ class OrderUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ["status"]
+        
+class OrderUpdateSerializer2(serializers.ModelSerializer):
+    def update(self, instance, validated_data):
+        # Update order fields
+        instance.created_at = validated_data.get("created_at", instance.created_at)
+        instance.save()
+
+        return instance
+
+    class Meta:
+        model = Order
+        fields = ["created_at"]
 
 
 class OrderUpdateChinaUrlSerializer(serializers.ModelSerializer):

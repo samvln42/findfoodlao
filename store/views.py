@@ -19,6 +19,12 @@ from django.http import JsonResponse
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import OrderingFilter
 from django.http import Http404
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.db.models import Q
+import openpyxl
+from openpyxl import Workbook
+from django.http import HttpResponse
 
 from .form import ReviewForm
 from .models import (
@@ -1150,7 +1156,189 @@ class PendingOrderListAPIView(generics.ListAPIView):
             {"count": len(serializer.data), "orders": serializer.data}
         )
 
+class PendingOrderListAPIView3(generics.ListAPIView):
+    serializer_class = PendingOrderSerializer
+    # pagination_class = OrderPagination  # Optional: Add pagination
 
+    def get_queryset(self):
+        store_id = self.request.query_params.get("store_id", None)
+        queryset = Order.objects.filter(status="Pending")
+        if store_id:
+            queryset = queryset.filter(store_id=store_id)
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
+        else:
+            serializer = self.serializer_class(queryset, many=True)
+        return response.Response({"count": len(serializer.data), "orders": serializer.data})
+
+class PendingOrderListAPIView4(generics.ListAPIView):
+    serializer_class = PendingOrderSerializer
+    # pagination_class = OrderPagination  # Optional: Add pagination
+
+    def get_queryset(self):
+        queryset = Order.objects.filter(status="Pending")
+        
+        # Optional filters
+        store_id = self.request.query_params.get("store_id", None)
+        tel = self.request.query_params.get("tel", None)
+        province = self.request.query_params.get("province", None)
+        district = self.request.query_params.get("district", None)
+        shipping_company = self.request.query_params.get("shipping_company", None)
+        date_filter = self.request.query_params.get("date_filter", None)
+        
+        # Apply filters if provided in query parameters
+        if store_id:
+            queryset = queryset.filter(store_id=store_id)
+        if tel:
+            queryset = queryset.filter(tel__icontains=tel)
+        if province:
+            queryset = queryset.filter(province__icontains=province)
+        if district:
+            queryset = queryset.filter(district__icontains=district)
+        if shipping_company:
+            queryset = queryset.filter(shipping_company__icontains=shipping_company)
+        
+        # Apply date-based filters
+        if date_filter:
+            today = timezone.now().date()
+            if date_filter == "month":
+                start_date = today.replace(day=1)
+                queryset = queryset.filter(created_at__date__gte=start_date)
+            elif date_filter == "q1":
+                start_date = today.replace(month=1, day=1)
+                end_date = today.replace(month=3, day=31)
+                queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+            elif date_filter == "q2":
+                start_date = today.replace(month=4, day=1)
+                end_date = today.replace(month=6, day=30)
+                queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+            elif date_filter == "q3":
+                start_date = today.replace(month=7, day=1)
+                end_date = today.replace(month=9, day=30)
+                queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+            elif date_filter == "q4":
+                start_date = today.replace(month=10, day=1)
+                end_date = today.replace(month=12, day=31)
+                queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+            elif date_filter == "year":
+                start_date = today.replace(month=1, day=1)
+                queryset = queryset.filter(created_at__date__gte=start_date)
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
+        else:
+            serializer = self.serializer_class(queryset, many=True)
+        return response.Response({"count": len(serializer.data), "orders": serializer.data})
+
+
+class DeliveredOrderListAPIView(generics.ListAPIView):
+    serializer_class = DeliveredOrderSerializer
+
+    def get_queryset(self):
+        queryset = Order.objects.filter(status="Delivered")
+        
+        date_filter = self.request.query_params.get("date_filter", None)
+        
+        
+        # Apply date-based filters
+        if date_filter:
+            today = timezone.now().date()
+            if date_filter == "month":
+                start_date = today.replace(day=1)
+                queryset = queryset.filter(created_at__date__gte=start_date)
+            elif date_filter == "q1":
+                start_date = today.replace(month=1, day=1)
+                end_date = today.replace(month=3, day=31)
+                queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+            elif date_filter == "q2":
+                start_date = today.replace(month=4, day=1)
+                end_date = today.replace(month=6, day=30)
+                queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+            elif date_filter == "q3":
+                start_date = today.replace(month=7, day=1)
+                end_date = today.replace(month=9, day=30)
+                queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+            elif date_filter == "q4":
+                start_date = today.replace(month=10, day=1)
+                end_date = today.replace(month=12, day=31)
+                queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+            elif date_filter == "year":
+                start_date = today.replace(month=1, day=1)
+                queryset = queryset.filter(created_at__date__gte=start_date)
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        
+        # Check if the download parameter is present
+        if request.query_params.get("download") == "true":
+            return self.download_excel(queryset)
+        
+        # Standard API response
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
+        else:
+            serializer = self.serializer_class(queryset, many=True)
+        return response.Response({"count": len(serializer.data), "orders": serializer.data})
+
+    def download_excel(self, queryset):
+        # Create a workbook and sheet
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Deliveried Orders"
+
+        # Write the header for orders
+        order_headers = [
+            'Order ID', 'User Email', 'Store', 'Telephone', 'Total Prices', 
+            'Address', 'Created At', 'Status', 'Product', 'Quantity', 
+            'Price', 'Is_seted'
+        ]
+        ws.append(order_headers)
+
+        # Write data rows for orders and items
+        for order in queryset:
+            order_base_row = [
+                order.id,
+                order.user.email if order.user else 'Guest',
+                order.store.name if order.store else 'aa',
+                order.tel,
+                order.total_prices,
+                order.district,
+                order.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                order.status,
+            ]
+            # Add each item related to the order
+            for item in order.orderitem_set.all():
+                row = order_base_row + [
+                    item.product.name if item.product else '',
+                    item.quantity,
+                    item.price,
+                    item.color,
+                ]
+                ws.append(row)
+
+        # Prepare the response
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="deliveried_orders.xlsx"'
+        
+        # Save the workbook to the response
+        wb.save(response)
+
+        return response
+    
+    
 class ProcessingOrderListAPIView(generics.ListAPIView):
     serializer_class = ProcessingOrderSerializer
 
@@ -1187,7 +1375,7 @@ class ShippedOrderListAPIView(generics.ListAPIView):
         )
 
 
-class DeliveredOrderListAPIView(generics.ListAPIView):
+class DeliveredOrderListAPIView2(generics.ListAPIView):
     serializer_class = DeliveredOrderSerializer
 
     def get_queryset(self):
