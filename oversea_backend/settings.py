@@ -18,7 +18,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["43.203.96.239", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["13.124.103.153", "localhost", "127.0.0.1"]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -72,32 +72,33 @@ CORS_ALLOW_HEADERS = [
 
 
 # s3 settings
-if not DEBUG:
+# if DEBUG:
     # aws settings
-    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
-    AWS_S3_SIGNATURE_VERSION = 's3v4'  # Corrected
-    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME")
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_DEFAULT_ACL = None
-    AWS_S3_VERIFY = True  # Corrected
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    # AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    # AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    # AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+    # AWS_S3_SIGNATURE_VERSION = 's3v4'  # Corrected
+    # AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME")
+    # AWS_S3_FILE_OVERWRITE = False
+    # AWS_DEFAULT_ACL = None
+    # AWS_S3_VERIFY = True  # Corrected
+    # DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     
-    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+    # AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
     
-    STATIC_LOCATION = "static"
-    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"  # Use https
+    # STATIC_LOCATION = "static"
+    # STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"  # Use https
     
-    PUBLIC_MEDIA_LOCATION = "media"
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"  # Use https
-else:
-    STATIC_URL = "/static/"
-    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-    MEDIA_URL = "/media/"
-    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+    # PUBLIC_MEDIA_LOCATION = "media"
+    # MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"  # Use https
 
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+# else:
 
     # # testing
     # # aws settings
